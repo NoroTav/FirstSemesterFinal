@@ -9,6 +9,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -32,7 +33,7 @@ public class FlashCardController extends Application {
     // Creation of the actual software with some initialization
     private List<FlashCard> flashcards = new ArrayList<>();
     private int currentIndex = 0;
-    Button goToScene2, prevBtn, nextBtn, newCard, infoBtn;
+    Button goToScene2, prevBtn, nextBtn, newCard, infoBtn, settings;
     Stage window;
     Scene scene1, scene2;
     Label cardLabel, welcomeLabel;
@@ -55,36 +56,49 @@ public class FlashCardController extends Application {
 
         //Primary Stage Setup
         window = primaryStage;
-        primaryStage.setTitle("Tavlet");
+        primaryStage.setTitle("Tav's FlashCards");
+//****************************Layout 1********************************************************************
+        welcomeLabel = new Label("Tav's FlashCards!");
+        goToScene2 = new Button("Create");
+        infoBtn = new Button("About");
+        settings = new Button("⚙");
 
-        //Layout 1
 
-        welcomeLabel = new Label("Welcome to Tavlet!");
-        goToScene2 = new Button("Create New Flash Card");
-        infoBtn = new Button("HOW TO USE");
+
         //Button Action: this button switches the scene
         goToScene2.setOnAction(e -> window.setScene(scene2));
 
 
         //Creates the object that sets the positions of the UI objects and customizes them
-        GridPane layout = new GridPane();
-        layout.setAlignment(Pos.CENTER);
-        layout.setBackground(new Background(new BackgroundFill(Color.DARKSALMON, CornerRadii.EMPTY, Insets.EMPTY)));
+        VBox sidebar = new VBox(20);
+        sidebar.setPadding(new Insets(20));
+        sidebar.setBackground(new Background(new BackgroundFill(Color.web("#333533"), CornerRadii.EMPTY, Insets.EMPTY)));
 
+        String sidebarBtnStyle = "-fx-background-color: #242423; -fx-text-fill: #cfdbd5; -fx-font-size: 25px;-fx-font-weight: bold; -fx-background-radius: 20px; -fx-padding: 10;";
+        //Customizes the buttons
+        goToScene2.setStyle(sidebarBtnStyle);
+        infoBtn.setStyle(sidebarBtnStyle);
+        settings.setStyle("-fx-background-color: #333533; -fx-text-fill: #cfdbd5; -fx-font-size: 24px; -fx-background-radius: 20px;");
         //Customizes the welcome label and set its position on the scene
-        welcomeLabel.setStyle("-fx-font-size: 45px;");
-        welcomeLabel.setAlignment(Pos.CENTER);
-        GridPane.setConstraints(welcomeLabel, 0,0);
+        welcomeLabel.setStyle("-fx-background-color: #242423; -fx-text-fill: #cfdbd5; -fx-font-size: 45px; -fx-background-radius: 55px; -fx-padding: 10;");
 
-        //Customizes the button to go to the next scene
-        goToScene2.setStyle("-fx-background-color: #20B2AA; -fx-text-fill: white; -fx-font-size: 32px; -fx-font-weight: bold; -fx-background-radius: 55px;");
-        GridPane.setConstraints(goToScene2, 0,3);
-        goToScene2.setAlignment(Pos.CENTER);
+        //Add buttons to sidebar
+        sidebar.getChildren().addAll(welcomeLabel ,goToScene2,infoBtn, settings);
 
-        //Customizes the Info Button
-        infoBtn.setStyle("-fx-background-color: #08302e; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 55px;");
-        GridPane.setConstraints(infoBtn, 0,4);
-        infoBtn.setAlignment(Pos.CENTER);
+        //Right side of the screen
+        VBox updateSection = new VBox(10);
+        updateSection.setPadding(new Insets(20));
+        updateSection.setBackground(new Background(new BackgroundFill(Color.web("#242423"), CornerRadii.EMPTY, Insets.EMPTY)));
+
+
+        //Update title creation
+        Label updateTitle = new Label("Update 1.0");
+        updateTitle.setStyle("-fx-text-fill: #cfdbd5; -fx-font-size: 24px; -fx-font-weight: bold;");
+
+        Label updateContent = new Label("- UI update\n- Saved Sets\n- About page\n- Settings");
+        updateContent.setStyle("-fx-text-fill: #f5cb5c; -fx-font-size: 24px;");
+
+        updateSection.getChildren().addAll(updateTitle, updateContent);
         //Sets up the information page
         infoBtn.setOnAction(e->{
             GridPane grid  = new GridPane();
@@ -109,126 +123,158 @@ public class FlashCardController extends Application {
             window.setScene(infoScene);
         });
 
-        //Adding the UI elements to the layout
-        layout.getChildren().addAll(welcomeLabel, goToScene2, infoBtn);
 
 
-        //Creating the Scene
-        scene1 = new Scene(layout, 900, 600);
+        //Combining the Left and Right Side
+        HBox mainLayout = new HBox(20);
+        mainLayout.setPadding(new Insets(20));
+        mainLayout.setBackground(new Background(new BackgroundFill(Color.web("#333533"), CornerRadii.EMPTY, Insets.EMPTY)));
 
 
-        //***********************************************Layout 2********************************************************************
-        //Creating and customizing a text field for the input of Term and Definition
-        TextField termField = new TextField();
-        termField.setPromptText("Term");
-        GridPane.setConstraints(termField, 0, 0);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
 
 
-        TextField defField = new TextField();
-        defField.setPromptText("Definition");
-        GridPane.setConstraints(defField, 0,1);
+        mainLayout.getChildren().addAll(sidebar, spacer, updateSection);
+        scene1 = new Scene(mainLayout, 800, 400);
 
-        termField.setAlignment(Pos.CENTER);
-        defField.setAlignment(Pos.CENTER);
 
-        // Make text bold
-        termField.setStyle("-fx-font-weight: bold;");
-        defField.setStyle("-fx-font-weight: bold;");
+//***********************************************Layout 2********************************************************************
 
-        //A descriptor for the flashcard
-        cardLabel = new Label("Click Next to view flashcards");
-        GridPane.setConstraints(cardLabel, 0, 2, 2, 1);
 
+        //Left Section
+        //Left of the Screen
+        VBox leftSection = new VBox(20);
+        leftSection.setPadding(new Insets(20));
+        leftSection.setAlignment(Pos.CENTER);
+        leftSection.setBackground(new Background(new BackgroundFill(Color.web("#333533"), CornerRadii.EMPTY, Insets.EMPTY)));
+
+
+        //Buttons for setting name description and saving flashcard sets
+
+        Button setNameBtn = new Button("Set Name");
+        Button setDescBtn = new Button("Set Description");
+        Button saveSetBtn = new Button("Save Set");
+
+
+        String buttonStyle = "-fx-background-color: #242423; -fx-text-fill: #f5cb5c; -fx-font-size: 18px; -fx-padding: 10; -fx-background-radius: 10px;";
+        setNameBtn.setStyle(buttonStyle);
+        setDescBtn.setStyle(buttonStyle);
+        saveSetBtn.setStyle(buttonStyle);
+
+        leftSection.getChildren().addAll(setNameBtn, setDescBtn, saveSetBtn);
+
+
+        // Right section layout
+        VBox rightSection = new VBox(20);
+        rightSection.setPadding(new Insets(20));
+        rightSection.setAlignment(Pos.TOP_CENTER);
+        rightSection.setBackground(new Background(new BackgroundFill(Color.web("#242423"), CornerRadii.EMPTY, Insets.EMPTY)));
+
+        // Button to add new flashcards
+        Button addFlashcardBtn = new Button("Add Flashcard");
+        addFlashcardBtn.setStyle("-fx-background-color: #242423; -fx-text-fill: #f5cb5c; -fx-font-size: 16px; -fx-background-radius: 5px; -fx-padding: 10;");
+        rightSection.getChildren().add(addFlashcardBtn);
+
+        addFlashcardBtn.setOnAction(e -> {
+            VBox flashcardForm = createFlashcardForm();
+            rightSection.getChildren().add(flashcardForm);
+        });
 
         //This button is basically the flash card
         //Customizing the FlashCard
         newCard = new Button("Click me to flip");
-        newCard.setStyle("-fx-background-color: #008080; -fx-text-fill: white; -fx-font-weight: bold;-fx-font-size: 20px;");
-        newCard.setMinSize(400,200);
-        GridPane.setConstraints(newCard, 0, 3, 2, 1);
+        newCard.setStyle("-fx-background-color: #242423; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 20px; -fx-padding: 20; -fx-background-radius: 20px;");
+        newCard.setMinWidth(400);
+        newCard.setMinHeight(400);
 
 
         //The buttons to switch between flashcards
         nextBtn = new Button("Next");
-        nextBtn.setStyle("-fx-background-color: #20B2AA; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 55px;");
-        GridPane.setConstraints(nextBtn, 1, 4);
+        nextBtn.setStyle("-fx-background-color: #242423; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 55px;");
+
+
+
         prevBtn = new Button("Previous");
-        prevBtn.setStyle("-fx-background-color: #20B2AA; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 55px;");
-        GridPane.setConstraints(prevBtn, 0, 4);
+        prevBtn.setStyle("-fx-background-color: #242423; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 55px;");
+
 
 
         //Button to save the cards to the ArrayList
         Button saveCardBtn = new Button("Save the Flashcard");
-        saveCardBtn.setStyle("-fx-background-color: #20B2AA; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 55px;");
-        GridPane.setConstraints(saveCardBtn, 1, 0);
-
-
-        //These are the action methods for the buttons
-        saveCardBtn.setOnAction(e->{
-            FlashCard flashCard = new FlashCard(termField.getText(), defField.getText());
-            flashcards.add(flashCard);
-            termField.clear();
-            defField.clear();
-            cardLabel.setText("Flashcard Saved! ");
-        });
+        saveCardBtn.setStyle("-fx-background-color: #ffd60a; -fx-text-fill: #333533; -fx-font-weight: bold; -fx-font-size: 18px; -fx-background-radius: 10px;");
 
         nextBtn.setOnAction(e-> showNextCard());
         prevBtn.setOnAction(e-> showPreviousCard());
         newCard.setOnAction(e-> flipCard());
 
-        //Controls the Layout of the UI objects
-        GridPane layout2 = new GridPane();
-        layout2.setPadding(new Insets(10, 10, 10, 10));  // Padding around the grid
-        layout2.setVgap(10);  // Vertical spacing between rows
-        layout2.setHgap(10);  // Horizontal spacing between columns
-        layout2.setAlignment(Pos.CENTER);  // Center the grid in the scene
-        layout2.getChildren().addAll(termField,defField, newCard, nextBtn, prevBtn, cardLabel, saveCardBtn);
-        layout2.setBackground(new Background(new BackgroundFill(Color.DARKSALMON, CornerRadii.EMPTY, Insets.EMPTY)));
+        // Main layout for the page
+        HBox mainLayout2 = new HBox(20);
+        mainLayout2.setPadding(new Insets(20));
+        mainLayout2.setBackground(new Background(new BackgroundFill(Color.web("#333533"), CornerRadii.EMPTY, Insets.EMPTY)));
+
+        mainLayout2.getChildren().addAll(leftSection, rightSection);
+        scene2 = new Scene(mainLayout2, 900, 600);
 
 
-        // Create the background color changing effect
-        createFlashingBackground(layout2);
-
-        //Flashes green when the new term or definition is entered
-        termField.setOnAction(e-> checkAndToggleFlashing(termField, defField, layout2));
-        defField.setOnAction(e-> checkAndToggleFlashing(termField, defField, layout2));
-
-        scene2 = new Scene(layout2, 900, 600);
         window.setScene(scene1);
         window.show();
 
 
     }
-    // Method to create the flashing background
-    private void createFlashingBackground(GridPane layout2) {
-        //Using Animation to control the color of the background
-        flashTimeline = new Timeline(
-                new KeyFrame(Duration.seconds(0.5), e ->
-                        layout2.setBackground(new Background(new BackgroundFill(Color.LIGHTGREEN, CornerRadii.EMPTY, Insets.EMPTY)))
-                ),
-                new KeyFrame(Duration.seconds(1), e ->
-                        layout2.setBackground(new Background(new BackgroundFill(Color.DARKSALMON, CornerRadii.EMPTY, Insets.EMPTY)))
-                )
-        );
+    private VBox createFlashcardForm() {
+        // Create a single flashcard input form
+        VBox flashcardForm = new VBox(10);
+        flashcardForm.setPadding(new Insets(10));
+        flashcardForm.setBackground(new Background(new BackgroundFill(Color.web("#dbe4dc"), CornerRadii.EMPTY, Insets.EMPTY)));
+        flashcardForm.setStyle("-fx-background-radius: 10px;");
 
-        //How many times the color flashes
-        flashTimeline.setCycleCount(1);
+        TextField termField = new TextField();
+        termField.setPromptText("Term");
+        TextField defField = new TextField();
+        defField.setPromptText("Definition");
+
+        Button saveCardBtn = new Button("Save");
+        saveCardBtn.setStyle("-fx-background-color: #242423; -fx-text-fill: #f5cb5c; -fx-font-size: 16px; -fx-background-radius: 5px;");
+
+        termField.setStyle("-fx-background-color: #ffffff; -fx-padding: 5; -fx-font-size: 14px; -fx-background-radius: 5px;");
+        defField.setStyle("-fx-background-color: #ffffff; -fx-padding: 5; -fx-font-size: 14px; -fx-background-radius: 5px;");
+
+        flashcardForm.getChildren().addAll(termField, defField, saveCardBtn);
+
+        //These are the action methods for the buttons
+        saveCardBtn.setOnAction(e->{
+            FlashCard flashCard = new FlashCard(termField.getText(), defField.getText());
+            flashcards.add(flashCard);
+            if(termField.getText().isEmpty()){
+                termField.setStyle("-fx-background-color: #FF0000;");
+            }else{
+                termField.setStyle("-fx-background-color: #f5cb5c;");
+            }
+
+            if(defField.getText().isEmpty()){
+                defField.setStyle("-fx-background-color: #FF0000;");
+            }else{
+                defField.setStyle("-fx-background-color: #f5cb5c;");
+            }
+        });
+
+        return flashcardForm;
     }
     // Method that actually determines what happens when the textfield is triggered
-    private void checkAndToggleFlashing(TextField termField, TextField defField, GridPane layout2) {
+    private void checkAndToggleFlashing(TextField termField, TextField defField, VBox layout2) {
         if (!termField.getText().isEmpty() || !defField.getText().isEmpty()) {
             //play the effect if there is not text for term or definition
             flashTimeline.play();
         } else {
             flashTimeline.stop();
-            layout2.setBackground(new Background(new BackgroundFill(Color.DARKSALMON, CornerRadii.EMPTY, Insets.EMPTY)));
+            layout2.setBackground(new Background(new BackgroundFill(Color.web("#333533"), CornerRadii.EMPTY, Insets.EMPTY)));
         }
     }
     //Shows the next card by increasing the index of the FlashCards array list
     private void showNextCard() {
         if (!flashcards.isEmpty() && currentIndex < flashcards.size() - 1) {
             currentIndex++;
-            cardLabel.setText(flashcards.get(currentIndex).getTerm());
             newCard.setText("Click to flip");
         }
     }
@@ -236,7 +282,6 @@ public class FlashCardController extends Application {
     private void showPreviousCard() {
         if (!flashcards.isEmpty() && currentIndex > 0) {
             currentIndex--;
-            cardLabel.setText(flashcards.get(currentIndex).getTerm());
             newCard.setText("Click to flip");
         }
     }
